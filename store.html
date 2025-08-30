@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Store | DorArr Enterprise Uganda Ltd</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script defer src="main.js"></script>
+  <script defer src="frontend-api.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="index.html" class="flex items-center">
+  <img src="logo.jpg" alt="DorArr Logo" class="w-14 h-14 rounded-full mr-2 shadow border border-gray-200 bg-white object-cover">
+  <span class="text-xl font-bold text-dorarrBlue">DorArr Enterprise</span>
+      </a>
+      <nav class="hidden md:flex space-x-8">
+        <a href="index.html" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">Home</a>
+        <a href="store.html" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">Store</a>
+        <a href="cart.html" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">Cart</a>
+        <a href="#" id="logout-btn" class="text-dorarrLightBlue font-medium hover:underline">Logout</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container mx-auto px-4 py-12">
+    <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
+      <h2 class="text-3xl font-bold text-dorarrBlue">Web Store</h2>
+      <div class="flex items-center gap-2 w-full md:w-auto">
+        <input id="store-search" type="text" placeholder="Search all products..." class="w-full md:w-96 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-dorarrBlue transition-all duration-300">
+        <button id="store-search-btn" class="bg-dorarrBlue text-white px-4 py-2 rounded-md hover:bg-dorarrLightBlue transition-all duration-300"><i class="fas fa-search"></i></button>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="store-products-list">
+      <!-- 100 sample products will be rendered here by JS -->
+    </div>
+    <div class="mt-10 text-right font-bold text-xl" id="store-cart-balance"></div>
+  </main>
+  <script>
+    // Generate 100 sample products
+    const storeProducts = Array.from({length: 100}, (_, i) => ({
+      id: i+1,
+      name: `Sample Product ${i+1}`,
+      price: Math.floor(Math.random()*90000+10000),
+      image: `https://source.unsplash.com/400x300/?product,${i+1}`,
+      rating: (Math.random()*2+3).toFixed(1)
+    }));
+    let storeCart = JSON.parse(localStorage.getItem('storeCart')) || [];
+    function renderStoreProducts(products) {
+      const grid = document.getElementById('store-products-list');
+      grid.innerHTML = '';
+      products.forEach(product => {
+        const card = document.createElement('div');
+        card.className = 'product-card bg-white rounded-lg overflow-hidden shadow-md fade-in animate-float';
+        card.innerHTML = `
+          <div class="relative">
+            <img src="${product.image}" alt="${product.name}" class="w-full h-48 object-cover transition-transform duration-500 hover:scale-105">
+          </div>
+          <div class="p-4">
+            <h3 class="font-semibold text-lg mb-1">${product.name}</h3>
+            <div class="flex items-center mb-2">
+              <div class="flex text-yellow-400">
+                ${'<i class="fas fa-star"></i>'.repeat(Math.floor(product.rating))}
+                ${(product.rating % 1 > 0.4) ? '<i class="fas fa-star-half-alt"></i>' : ''}
+                ${'<i class="far fa-star"></i>'.repeat(5 - Math.ceil(product.rating))}
+              </div>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-dorarrBlue font-bold text-lg">UGX ${product.price.toLocaleString()}</span>
+              <button class="bg-dorarrBlue text-white p-2 rounded-full hover:bg-dorarrLightBlue transition add-to-store-cart" data-id="${product.id}">
+                <i class="fas fa-shopping-cart"></i>
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+    function updateStoreCartBalance() {
+      const total = storeCart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      document.getElementById('store-cart-balance').textContent = `Cart Total: UGX ${total.toLocaleString()}`;
+    }
+    function setupStoreCart() {
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.add-to-store-cart')) {
+          const id = parseInt(e.target.closest('.add-to-store-cart').dataset.id);
+          const product = storeProducts.find(p => p.id === id);
+          if (!product) return;
+          const existing = storeCart.find(item => item.id === id);
+          if (existing) {
+            existing.qty += 1;
+          } else {
+            storeCart.push({ ...product, qty: 1 });
+          }
+          localStorage.setItem('storeCart', JSON.stringify(storeCart));
+          updateStoreCartBalance();
+        }
+      });
+    }
+    function setupStoreSearch() {
+      const input = document.getElementById('store-search');
+      const btn = document.getElementById('store-search-btn');
+      function doSearch() {
+        const q = input.value.trim().toLowerCase();
+        if (!q) {
+          renderStoreProducts(storeProducts);
+          return;
+        }
+        const filtered = storeProducts.filter(p => p.name.toLowerCase().includes(q));
+        renderStoreProducts(filtered);
+      }
+      input.addEventListener('input', doSearch);
+      btn.addEventListener('click', doSearch);
+    }
+    // Auth check
+    if (!localStorage.getItem('dorarrToken')) {
+      window.location.href = 'login.html';
+    }
+    // Logout
+    document.getElementById('logout-btn').onclick = function() {
+      localStorage.removeItem('dorarrToken');
+      window.location.href = 'login.html';
+    };
+    // Init
+    renderStoreProducts(storeProducts);
+    setupStoreCart();
+    setupStoreSearch();
+    updateStoreCartBalance();
+  </script>
+</body>
+</html>

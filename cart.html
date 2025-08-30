@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Cart | DorArr Enterprise Uganda Ltd</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script defer src="main.js"></script>
+  <script defer src="frontend-api.js"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <header class="bg-white shadow-md sticky top-0 z-50">
+    <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+      <a href="index.html" class="flex items-center">
+  <img src="logo.jpg" alt="DorArr Logo" class="w-14 h-14 rounded-full mr-2 shadow border border-gray-200 bg-white object-cover">
+  <span class="text-xl font-bold text-dorarrBlue">DorArr Enterprise</span>
+      </a>
+      <nav class="hidden md:flex space-x-8">
+        <a href="index.html" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">Home</a>
+        <a href="products.html" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">All Products</a>
+        <a href="cart.html" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">Cart</a>
+        <a href="login.html" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">Login</a>
+      </nav>
+    </div>
+  </header>
+  <main class="container mx-auto px-4 py-12">
+    <h2 class="text-3xl font-bold text-dorarrBlue mb-8 text-center">Your Cart</h2>
+    <div id="cart-content">
+      <!-- Cart items will be rendered here by JS -->
+    </div>
+  </main>
+  <script>
+    async function fetchCart() {
+      const token = localStorage.getItem('dorarrToken');
+      if (!token) {
+        document.getElementById('cart-content').innerHTML = '<div class="text-center text-red-600">Please <a href="login.html" class="text-dorarrLightBlue underline">login</a> to view your cart.</div>';
+        return;
+      }
+      const res = await fetch('/api/cart', { headers: { Authorization: 'Bearer ' + token } });
+      if (!res.ok) {
+        document.getElementById('cart-content').innerHTML = '<div class="text-center text-red-600">Failed to load cart.</div>';
+        return;
+      }
+      const cart = await res.json();
+      if (!cart.items || cart.items.length === 0) {
+        document.getElementById('cart-content').innerHTML = '<div class="text-center text-gray-600">Your cart is empty.</div>';
+        return;
+      }
+      let html = '<div class="overflow-x-auto"><table class="min-w-full bg-white rounded-lg"><thead><tr><th class="py-2 px-4">Product</th><th class="py-2 px-4">Qty</th><th class="py-2 px-4">Price</th><th class="py-2 px-4">Total</th></tr></thead><tbody>';
+      cart.items.forEach(item => {
+        html += `<tr><td class="py-2 px-4 flex items-center"><img src="${item.image}" class="w-12 h-12 rounded mr-2">${item.name}</td><td class="py-2 px-4">${item.qty}</td><td class="py-2 px-4">UGX ${item.price.toLocaleString()}</td><td class="py-2 px-4">UGX ${(item.price * item.qty).toLocaleString()}</td></tr>`;
+      });
+      html += `</tbody></table></div><div class="mt-6 text-right font-bold text-lg">Cart Total: UGX ${cart.total.toLocaleString()}</div>`;
+      html += `<div class="mt-6 text-right"><a href="checkout.html" class="bg-dorarrBlue text-white px-6 py-2 rounded-md hover:bg-dorarrLightBlue transition">Proceed to Checkout</a></div>`;
+      document.getElementById('cart-content').innerHTML = html;
+    }
+    window.addEventListener('DOMContentLoaded', fetchCart);
+  </script>
+</body>
+</html>

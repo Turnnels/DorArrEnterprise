@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DorArr Enterprise Uganda Ltd | Fashion, Furniture & More</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script defer src="main.js"></script>
+    <script defer src="frontend-api.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dorarrBlue: '#1a4b8c',
+                        dorarrLightBlue: '#3a7bd5',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom CSS for animations and elements not covered by Tailwind */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-card {
+            transition: all 0.3s ease;
+        }
+        
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .animate-bounce {
+            animation: bounce 0.6s;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            20% { transform: translateY(-8px); }
+            40% { transform: translateY(0); }
+            60% { transform: translateY(-4px); }
+            80% { transform: translateY(0); }
+        }
+        
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+        
+        .mobile-menu.open {
+            max-height: 500px;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .hero-text {
+                font-size: 2rem;
+            }
+            
+            .hero-subtext {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans bg-gray-50">
+    <!-- Header/Navigation -->
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <!-- Logo -->
+            <div class="flex items-center">
+                <img src="logo.jpg" alt="DorArr Logo" class="w-14 h-14 rounded-full mr-2 shadow border border-gray-200 bg-white object-cover">
+                <span class="text-xl font-bold text-dorarrBlue">DorArr Enterprise</span>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex space-x-8">
+                <a href="#home" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">Home</a>
+                
+                <div class="dropdown relative">
+                    <button class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition flex items-center">
+                        Products <i class="fas fa-chevron-down ml-1 text-xs"></i>
+                    </button>
+                    <div class="dropdown-content absolute bg-white mt-2 rounded-md shadow-lg py-2 w-48">
+                        <a href="#fashion" class="block px-4 py-2 text-gray-800 hover:bg-blue-50">Fashion & Lifestyle</a>
+                        <a href="#furniture" class="block px-4 py-2 text-gray-800 hover:bg-blue-50">Home & Furniture</a>
+                        <a href="#education" class="block px-4 py-2 text-gray-800 hover:bg-blue-50">Education & Knowledge</a>
+                    </div>
+                </div>
+                
+                <a href="#services" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">Services</a>
+                <a href="#about" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">About Us</a>
+                <a href="#contact" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">Contact</a>
+            </nav>
+            
+            <!-- Mobile menu button -->
+            <div class="md:hidden flex items-center space-x-4">
+                <div class="relative">
+                    <a href="#cart" class="text-dorarrBlue">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="cart-badge">0</span>
+                    </a>
+                </div>
+                <button id="mobile-menu-button" class="text-dorarrBlue focus:outline-none">
+                    <i class="fas fa-bars text-2xl"></i>
+                </button>
+            </div>
+            
+            <!-- Desktop Auth/Cart -->
+            <div class="hidden md:flex items-center space-x-6">
+                <div class="relative">
+                    <a href="#cart" class="text-dorarrBlue">
+                        <i class="fas fa-shopping-cart text-xl"></i>
+                        <span class="cart-badge">0</span>
+                    </a>
+                </div>
+                <a href="login.html" class="text-dorarrBlue font-medium hover:text-dorarrLightBlue transition">Login</a>
+                <a href="signup.html" class="bg-dorarrBlue text-white px-4 py-2 rounded-md hover:bg-dorarrLightBlue transition">Register</a>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="mobile-menu bg-white md:hidden">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+                <a href="#home" class="text-dorarrBlue font-medium py-2 border-b border-gray-100">Home</a>
+                <div>
+                    <button class="text-dorarrBlue font-medium py-2 border-b border-gray-100 w-full text-left flex justify-between items-center">
+                        Products <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="pl-4 hidden">
+                        <a href="#fashion" class="block py-2 text-gray-600">Fashion & Lifestyle</a>
+                        <a href="#furniture" class="block py-2 text-gray-600">Home & Furniture</a>
+                        <a href="#education" class="block py-2 text-gray-600">Education & Knowledge</a>
+                    </div>
+                </div>
+                <a href="#services" class="text-dorarrBlue font-medium py-2 border-b border-gray-100">Services</a>
+                <a href="#about" class="text-dorarrBlue font-medium py-2 border-b border-gray-100">About Us</a>
+                <a href="#contact" class="text-dorarrBlue font-medium py-2 border-b border-gray-100">Contact</a>
+                <div class="pt-2 flex justify-between">
+                    <a href="login.html" class="text-dorarrBlue font-medium">Login</a>
+                    <a href="signup.html" class="bg-dorarrBlue text-white px-4 py-2 rounded-md">Register</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="bg-gradient-to-r from-dorarrBlue to-dorarrLightBlue text-white py-20">
+        <div class="container mx-auto px-4 flex flex-col md:flex-row items-center">
+            <div class="md:w-1/2 mb-10 md:mb-0 fade-in">
+                <h1 class="hero-text text-4xl md:text-5xl font-bold mb-4">Quality Products & Services in Uganda</h1>
+                <p class="hero-subtext text-xl mb-8">Discover our wide range of fashion, furniture, and educational products with convenient delivery across Uganda.</p>
+                <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                    <a href="#products" class="bg-white text-dorarrBlue px-6 py-3 rounded-md font-medium text-center hover:bg-gray-100 transition">Shop Now</a>
+                    <a href="#services" class="border-2 border-white text-white px-6 py-3 rounded-md font-medium text-center hover:bg-white hover:text-dorarrBlue transition">Our Services</a>
+                </div>
+            </div>
+            <div class="md:w-1/2 fade-in delay-1">
+                <img src="https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="DorArr Products" class="rounded-lg shadow-xl w-full h-auto">
+            </div>
+        </div>
+    </section>
+
+    <!-- Features/Why Choose Us -->
+    <section class="bg-white py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-dorarrBlue mb-12 fade-in">Why Choose DorArr Enterprise</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md transition fade-in delay-1">
+                    <div class="w-12 h-12 bg-dorarrBlue rounded-full flex items-center justify-center text-white mb-4">
+                        <i class="fas fa-truck text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-dorarrBlue">Fast Delivery</h3>
+                    <p class="text-gray-600">Reliable delivery services across Uganda with real-time tracking for your orders.</p>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md transition fade-in delay-2">
+                    <div class="w-12 h-12 bg-dorarrBlue rounded-full flex items-center justify-center text-white mb-4">
+                        <i class="fas fa-shield-alt text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-dorarrBlue">Quality Guaranteed</h3>
+                    <p class="text-gray-600">We source only the best products and stand behind everything we sell.</p>
+                </div>
+                
+                <div class="bg-gray-50 p-6 rounded-lg shadow-sm hover:shadow-md transition fade-in delay-3">
+                    <div class="w-12 h-12 bg-dorarrBlue rounded-full flex items-center justify-center text-white mb-4">
+                        <i class="fas fa-headset text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-dorarrBlue">24/7 Support</h3>
+                    <p class="text-gray-600">Our customer service team is always available to assist you via phone, chat or email.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section id="products" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center mb-8 gap-4">
+                <h2 class="text-3xl font-bold text-dorarrBlue">Featured Products</h2>
+                <div class="flex items-center gap-2 w-full md:w-auto">
+                  <input id="product-search" type="text" placeholder="Search products..." class="w-full md:w-64 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-dorarrBlue transition-all duration-300">
+                  <button id="search-btn" class="bg-dorarrBlue text-white px-4 py-2 rounded-md hover:bg-dorarrLightBlue transition-all duration-300"><i class="fas fa-search"></i></button>
+                </div>
+                <a href="products.html" class="text-dorarrLightBlue hover:underline">View All</a>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="featured-products-list">
+                <!-- Sample products will be rendered here by JS -->
+            </div>
+        </div>
+        /* Extra animation for product cards */
+        .animate-float {
+            animation: float 1.8s ease-in-out infinite alternate;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-10px) scale(1.03); box-shadow: 0 12px 32px rgba(26,75,140,0.08); }
+        }
+    </section>
+
+    <!-- Product Categories -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-dorarrBlue mb-12">Shop by Category</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Fashion & Lifestyle -->
+                <a href="#fashion" class="group relative overflow-hidden rounded-lg shadow-md h-64">
+                    <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Fashion & Lifestyle" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                        <h3 class="text-white text-2xl font-bold">Fashion & Lifestyle</h3>
+                    </div>
+                </a>
+                
+                <!-- Home & Furniture -->
+                <a href="#furniture" class="group relative overflow-hidden rounded-lg shadow-md h-64">
+                    <img src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Home & Furniture" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                        <h3 class="text-white text-2xl font-bold">Home & Furniture</h3>
+                    </div>
+                </a>
+                
+                <!-- Education & Knowledge -->
+                <a href="#education" class="group relative overflow-hidden rounded-lg shadow-md h-64">
+                    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Education & Knowledge" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+                        <h3 class="text-white text-2xl font-bold">Education & Knowledge</h3>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-dorarrBlue mb-12">Our Services</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Service 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-dorarrBlue rounded-full flex items-center justify-center text-white mb-4 mx-auto">
+                        <i class="fas fa-bullhorn text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-center text-dorarrBlue">Advertising & Promotions</h3>
+                    <p class="text-gray-600 text-center">Professional advertising services to help your business reach more customers through various media channels.</p>
+                    <div class="mt-4 text-center">
+                        <a href="service-details.html" class="text-dorarrLightBlue hover:underline">Learn More</a>
+                    </div>
+                </div>
+                
+                <!-- Service 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-dorarrBlue rounded-full flex items-center justify-center text-white mb-4 mx-auto">
+                        <i class="fas fa-ticket-alt text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-center text-dorarrBlue">Ticketing Services</h3>
+                    <p class="text-gray-600 text-center">Convenient ticket booking for events, travel, and entertainment across Uganda and beyond.</p>
+                    <div class="mt-4 text-center">
+                        <a href="#service-details" class="text-dorarrLightBlue hover:underline">Learn More</a>
+                    </div>
+                </div>
+                
+                <!-- Service 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-dorarrBlue rounded-full flex items-center justify-center text-white mb-4 mx-auto">
+                        <i class="fas fa-truck text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-center text-dorarrBlue">Delivery Services</h3>
+                    <p class="text-gray-600 text-center">Reliable and timely delivery of goods and packages to any location in Uganda with real-time tracking.</p>
+                    <div class="mt-4 text-center">
+                        <a href="#service-details" class="text-dorarrLightBlue hover:underline">Learn More</a>
+                    </div>
+                </div>
+                
+                <!-- Service 4 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-dorarrBlue rounded-full flex items-center justify-center text-white mb-4 mx-auto">
+                        <i class="fas fa-briefcase text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-center text-dorarrBlue">Hiring Services</h3>
+                    <p class="text-gray-600 text-center">Staff recruitment and temporary hiring solutions for businesses and events.</p>
+                    <div class="mt-4 text-center">
+                        <a href="#service-details" class="text-dorarrLightBlue hover:underline">Learn More</a>
+                    </div>
+                </div>
+                
+                <!-- Service 5 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-dorarrBlue rounded-full flex items-center justify-center text-white mb-4 mx-auto">
+                        <i class="fas fa-plane text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-center text-dorarrBlue">Tour & Travel</h3>
+                    <p class="text-gray-600 text-center">Customized tour packages and travel arrangements to Uganda's most beautiful destinations.</p>
+                    <div class="mt-4 text-center">
+                        <a href="#service-details" class="text-dorarrLightBlue hover:underline">Learn More</a>
+                    </div>
+                </div>
+                
+                <!-- Service 6 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition">
+                    <div class="w-16 h-16 bg-dorarrBlue rounded-full flex items-center justify-center text-white mb-4 mx-auto">
+                        <i class="fas fa-birthday-cake text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-center text-dorarrBlue">Birthday Planning</h3>
+                    <p class="text-gray-600 text-center">Complete birthday party planning services including venue, catering, decorations and entertainment.</p>
+                    <div class="mt-4 text-center">
+                        <a href="#service-details" class="text-dorarrLightBlue hover:underline">Learn More</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 text-center">
+                <a href="services.html" class="bg-dorarrBlue text-white px-6 py-3 rounded-md font-medium hover:bg-dorarrLightBlue transition inline-block">View All Services</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section id="about" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center">
+                <div class="md:w-1/2 mb-8 md:mb-0 md:pr-8">
+                    <img src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="DorArr Team" class="rounded-lg shadow-lg w-full">
+                </div>
+                <div class="md:w-1/2">
+                    <h2 class="text-3xl font-bold text-dorarrBlue mb-6">About DorArr Enterprise</h2>
+                    <p class="text-gray-600 mb-4">Founded in 2015, DorArr Enterprise Uganda Ltd has grown to become a trusted name in retail and service provision across Uganda. Our mission is to provide high-quality products and exceptional services that enhance our customers' lifestyles and businesses.</p>
+                    <p class="text-gray-600 mb-6">Located along Kawempe–Tula Road, we serve customers from all over Uganda with our diverse range of products and comprehensive service offerings.</p>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold text-dorarrBlue mb-3">Our Vision</h3>
+                        <p class="text-gray-600">To be Uganda's leading one-stop shop for quality products and innovative services that transform lives and businesses.</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold text-dorarrBlue mb-3">Our Values</h3>
+                        <ul class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-600">Customer Satisfaction</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-600">Integrity & Honesty</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-600">Quality Products</span>
+                            </li>
+                            <li class="flex items-start">
+                                <i class="fas fa-check text-green-500 mt-1 mr-2"></i>
+                                <span class="text-gray-600">Innovation</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <a href="#full-story" class="text-dorarrLightBlue hover:underline font-medium">Read Our Full Story</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-dorarrBlue mb-12">What Our Customers Say</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full overflow-hidden mr-4">
+                            <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Sarah K." class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Sarah K.</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"The furniture I bought from DorArr has transformed my living room. The quality is exceptional and the delivery was faster than promised. Highly recommend!"</p>
+                </div>
+                
+                <!-- Testimonial 2 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full overflow-hidden mr-4">
+                            <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="James M." class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">James M.</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star-half-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"Their advertising services helped my small business reach new customers. Professional, creative, and affordable - exactly what I needed to grow."</p>
+                </div>
+                
+                <!-- Testimonial 3 -->
+                <div class="bg-white p-6 rounded-lg shadow-sm">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 rounded-full overflow-hidden mr-4">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Grace N." class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <h4 class="font-semibold">Grace N.</h4>
+                            <div class="flex text-yellow-400">
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="fas fa-star"></i>
+                                <i class="far fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="text-gray-600">"DorArr planned my daughter's birthday party from start to finish. Everything was perfect and I didn't have to worry about a thing. Will use them again!"</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-16 bg-dorarrBlue text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Ready to Experience the DorArr Difference?</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">Join thousands of satisfied customers who trust us for quality products and exceptional services.</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="signup.html" class="bg-white text-dorarrBlue px-6 py-3 rounded-md font-medium hover:bg-gray-100 transition">Create Account</a>
+                <a href="#contact" class="border-2 border-white px-6 py-3 rounded-md font-medium hover:bg-white hover:text-dorarrBlue transition">Contact Us</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-dorarrBlue mb-12">Contact Us</h2>
+            
+            <div class="flex flex-col md:flex-row">
+                <div class="md:w-1/2 mb-8 md:mb-0 md:pr-8">
+                    <h3 class="text-xl font-semibold text-dorarrBlue mb-4">Get in Touch</h3>
+                    
+                    <div class="mb-6">
+                        <div class="flex items-start mb-4">
+                            <div class="w-10 h-10 bg-dorarrBlue rounded-full flex items-center justify-center text-white mr-4">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Address</h4>
+                                <p class="text-gray-600">Along Kawempe–Tula Road, Kampala, Uganda</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start mb-4">
+                            <div class="w-10 h-10 bg-dorarrBlue rounded-full flex items-center justify-center text-white mr-4">
+                                <i class="fas fa-phone-alt"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Phone</h4>
+                                <p class="text-gray-600">+256 700 123456</p>
+                                <p class="text-gray-600">+256 750 987654</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start mb-4">
+                            <div class="w-10 h-10 bg-dorarrBlue rounded-full flex items-center justify-center text-white mr-4">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">Email</h4>
+                                <p class="text-gray-600">info@dorarrent.com</p>
+                                <p class="text-gray-600">support@dorarrent.com</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex items-start">
+                            <div class="w-10 h-10 bg-dorarrBlue rounded-full flex items-center justify-center text-white mr-4">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-medium">WhatsApp</h4>
+                                <p class="text-gray-600">+256 700 123456</p>
+                                <a href="https://wa.me/256700123456" class="text-dorarrLightBlue hover:underline">Chat with us</a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-xl font-semibold text-dorarrBlue mb-4">Business Hours</h3>
+                    <ul class="space-y-2">
+                        <li class="flex justify-between border-b border-gray-100 pb-2">
+                            <span class="font-medium">Monday - Friday</span>
+                            <span class="text-gray-600">8:00 AM - 6:00 PM</span>
+                        </li>
+                        <li class="flex justify-between border-b border-gray-100 pb-2">
+                            <span class="font-medium">Saturday</span>
+                            <span class="text-gray-600">9:00 AM - 4:00 PM</span>
+                        </li>
+                        <li class="flex justify-between">
+                            <span class="font-medium">Sunday</span>
+                            <span class="text-gray-600">Closed</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="md:w-1/2">
+                    <div class="bg-gray-50 p-6 rounded-lg shadow-sm">
+                        <h3 class="text-xl font-semibold text-dorarrBlue mb-4">Send Us a Message</h3>
+                        <form>
+                            <div class="mb-4">
+                                <label for="name" class="block text-gray-700 mb-2">Your Name</label>
+                                <input type="text" id="name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-dorarrBlue">
+                            </div>
+                            <div class="mb-4">
+                                <label for="email" class="block text-gray-700 mb-2">Email Address</label>
+                                <input type="email" id="email" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-dorarrBlue">
+                            </div>
+                            <div class="mb-4">
+                                <label for="phone" class="block text-gray-700 mb-2">Phone Number</label>
+                                <input type="tel" id="phone" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-dorarrBlue">
+                            </div>
+                            <div class="mb-4">
+                                <label for="subject" class="block text-gray-700 mb-2">Subject</label>
+                                <input type="text" id="subject" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-dorarrBlue">
+                            </div>
+                            <div class="mb-4">
+                                <label for="message" class="block text-gray-700 mb-2">Message</label>
+                                <textarea id="message" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-dorarrBlue"></textarea>
+                            </div>
+                            <button type="submit" class="bg-dorarrBlue text-white px-6 py-2 rounded-md hover:bg-dorarrLightBlue transition">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 rounded-lg overflow-hidden">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3989.7536223157963!2d32.56737431475393!3d0.3132209997999955!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x177dbb93c5695ab7%3A0x8e56702a006d6f5a!2sKawempe-Tula%20Rd%2C%20Kampala%2C%20Uganda!5e0!3m2!1sen!2sus!4v1620000000000!5m2!1sen!2sus" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </div>
+    </section>
+
+    <!-- Blog Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold text-dorarrBlue">From Our Blog</h2>
+                <a href="#blog" class="text-dorarrLightBlue hover:underline">View All Posts</a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Blog Post 1 -->
+                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Business Tips" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center text-sm text-gray-500 mb-2">
+                            <span>June 15, 2023</span>
+                            <span class="mx-2">•</span>
+                            <span>Business</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-dorarrBlue">5 Essential Tips for Starting a Business in Uganda</h3>
+                        <p class="text-gray-600 mb-4">Learn the key strategies to successfully launch and grow your business in Uganda's competitive market.</p>
+                        <a href="#read-more" class="text-dorarrLightBlue hover:underline font-medium">Read More</a>
+                    </div>
+                </div>
+                
+                <!-- Blog Post 2 -->
+                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Fashion Trends" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center text-sm text-gray-500 mb-2">
+                            <span>May 28, 2023</span>
+                            <span class="mx-2">•</span>
+                            <span>Fashion</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-dorarrBlue">Summer 2023 Fashion Trends in East Africa</h3>
+                        <p class="text-gray-600 mb-4">Discover the hottest fashion trends this summer season and how to incorporate them into your wardrobe.</p>
+                        <a href="#read-more" class="text-dorarrLightBlue hover:underline font-medium">Read More</a>
+                    </div>
+                </div>
+                
+                <!-- Blog Post 3 -->
+                <div class="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
+                    <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1000&q=80" alt="Home Decor" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <div class="flex items-center text-sm text-gray-500 mb-2">
+                            <span>April 10, 2023</span>
+                            <span class="mx-2">•</span>
+                            <span>Home</span>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-3 text-dorarrBlue">Modern Home Decor Ideas on a Budget</h3>
+                        <p class="text-gray-600 mb-4">Transform your living space with these affordable yet stylish home decor ideas that anyone can implement.</p>
+                        <a href="#read-more" class="text-dorarrLightBlue hover:underline font-medium">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Newsletter -->
+    <section class="py-16 bg-dorarrBlue text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-4">Stay Updated</h2>
+            <p class="text-xl mb-8 max-w-2xl mx-auto">Subscribe to our newsletter for the latest products, services, and promotions from DorArr Enterprise.</p>
+            
+            <form class="max-w-md mx-auto flex">
+                <input type="email" placeholder="Your email address" class="flex-grow px-4 py-3 rounded-l-md focus:outline-none text-gray-800">
+                <button type="submit" class="bg-dorarrLightBlue px-6 py-3 rounded-r-md hover:bg-blue-400 transition">Subscribe</button>
+            </form>
+            
+            <p class="mt-4 text-sm opacity-80">We respect your privacy. Unsubscribe at any time.</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white pt-12 pb-6">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+                <!-- About -->
+                <div>
+                    <h3 class="text-lg font-semibold mb-4">About DorArr</h3>
+                    <p class="text-gray-400 mb-4">DorArr Enterprise Uganda Ltd is a leading provider of quality products and innovative services in Uganda.</p>
+                    <div class="flex space-x-4">
+                        <a href="staff.html"
+</body>
+</html>
